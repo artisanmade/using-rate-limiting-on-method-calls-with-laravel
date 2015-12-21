@@ -13,12 +13,14 @@
 
 // API Routes
 $router->group(['namespace' => 'Apis', 'prefix' => 'api'], function ($router) {
+
     // Store New Photo
     $router->post('photos', 'PhotoApi@store');
 });
 
 // Controller Routes
 $router->group(['namespace' => 'Controllers'], function ($router) {
+
     // Upload Photo
     $router->post('photos/upload', 'PhotoController@upload');
     $router->get('photos/upload', 'PhotoController@uploadForm');
