@@ -2,16 +2,17 @@
 
 namespace App\Repositories\Proxies;
 
+use App\Exceptions\RateLimitException;
 use App\Repositories\PhotoRepository;
 use App\Services\RateLimiter;
 
-class PhotoRepository
+class PhotoRepositoryProxy
 {
     /**
      * The duration that should be used for a timeout when
      * the rate limits are exceeded by too many method calls.
      *
-     * @var integer
+     * @var int
      */
     protected $timeout = 10;
 
@@ -48,9 +49,9 @@ class PhotoRepository
      * and the rate limiting service class that will throttle method calls.
      *
      * @param \App\Contracts\PhotoRepository $instance
-     * @param \App\Services\RateLimiter     $limiter
+     * @param \App\Services\RateLimiter      $limiter
      */
-    public function __construct( PhotoRepository $instance, RateLimiter $limiter)
+    public function __construct(PhotoRepository $instance, RateLimiter $limiter)
     {
         $this->instance = $instance;
         $this->limiter = $limiter;
@@ -67,29 +68,26 @@ class PhotoRepository
      * Basically everything inside the first conditional statement could be
      * abstracted as protected methods on this class.
      *
-     * @param  string $method to be called on proxied class
-     * @param  array $parameters to be forwarded to proxied class method call
-     *
-     * @return mixed
+     * @param string $method     to be called on proxied class
+     * @param array  $parameters to be forwarded to proxied class method call
      *
      * @throws \App\Exceptions\RateLimitException when limits are exceeded
-     * @throws \BadMethodCallException when method does not exist on proxied instance
+     * @throws \BadMethodCallException            when method does not exist on proxied instance
+     *
+     * @return mixed
      */
     public function __call($method, $parameters)
     {
         // Guard against bad method calls.
-        if( method_exists($this->instance, $method) )
-        {
+        if (method_exists($this->instance, $method)) {
             // Only rate limit if the method is set to be.
-            if( $this->limiter->isLimited($method) )
-            {
+            if ($this->limiter->isLimited($method)) {
                 // Throw an exception if the rate limit has been exceeded.
-                if( $this->limiter->limitExceeded($method) )
-                {
-                    $callable = get_class($this->instance) . '::' . $method;
-                    $max      = $this->limiter->getMax($method);
-                    $timeout  = $this->limiter->getTimeout();
-                    $message  = $callable.'() cannot be called more than '.$max.' in '.$timeout.' minutes.';
+                if ($this->limiter->limitExceeded($method)) {
+                    $callable = get_class($this->instance).'::'.$method;
+                    $max = $this->limiter->getMax($method);
+                    $timeout = $this->limiter->getTimeout();
+                    $message = $callable.'() cannot be called more than '.$max.' in '.$timeout.' minutes.';
                     throw new RateLimitException($message, 429);
                 }
 
@@ -109,8 +107,6 @@ class PhotoRepository
     /**
      * Setup the proxy by copying the proxy's configurations to
      * the rate limiting service.
-     *
-     * @return void
      */
     public function boot()
     {

@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\PhotoRepository as PhotoRepositoryInterface;
-use App\Repositories\Proxies\PhotoRepository;
+use App\Repositories\Proxies\PhotoRepositoryProxy;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -17,14 +17,12 @@ class PhotoServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register()
     {
-    	// When the container receives a request for the contract
-    	// it will return the concrete repository instead. This
-    	// repository should implement the interface.
-        $this->app->bind(PhotoRepositoryInterface::class, PhotoRepository::class);
+        // When the container receives a request for the contract
+        // it will return the concrete repository instead. This
+        // repository should implement the interface.
+        $this->app->bind(PhotoRepositoryInterface::class, PhotoRepositoryProxy::class);
     }
 }

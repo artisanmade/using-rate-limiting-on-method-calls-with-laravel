@@ -12,25 +12,22 @@
 */
 
 // API Routes
-$router->group(['namespace' => 'Apis', 'prefix' => 'api'], function ($router)
-{
-	// Store New Photo
-	$router->post('photos', 'PhotoApi@store');
+$router->group(['namespace' => 'Apis', 'prefix' => 'api'], function ($router) {
+    // Store New Photo
+    $router->post('photos', 'PhotoApi@store');
 });
 
 // Controller Routes
-$router->group(['namespace' => 'Controllers'], function ($router)
-{
-	// Upload Photo
-	$router->post('photos/upload', 'PhotoController@upload');
-	$router->get('photos/upload', 'PhotoController@uploadForm');
+$router->group(['namespace' => 'Controllers'], function ($router) {
+    // Upload Photo
+    $router->post('photos/upload', 'PhotoController@upload');
+    $router->get('photos/upload', 'PhotoController@uploadForm');
 
-	// Show Photo
-	$router->get('photos/{id}', 'PhotoController@show');
+    // Show Photo
+    $router->get('photos/{id}', 'PhotoController@show');
 });
 
 // Welcome Page
-$router->get('/', function ()
-{
+$router->get('/', function () {
     return view('welcome');
 });

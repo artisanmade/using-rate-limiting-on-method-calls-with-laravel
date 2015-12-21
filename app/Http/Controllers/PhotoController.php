@@ -39,7 +39,7 @@ class PhotoController extends PhotoApi
         // Now redirect to the photo's page with
         // a flash message indicating success.
         return redirect()
-            ->to('photos/' . $photo->id)
+            ->to('photos/'.$photo->id)
             ->with('message', 'Photo uploaded!');
     }
 }

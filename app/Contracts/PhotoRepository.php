@@ -11,7 +11,7 @@ interface PhotoRepository
     /**
      * Create and return a new Photo model.
      *
-     * @param  array $attributes
+     * @param array $attributes
      *
      * @return \App\Photo
      */

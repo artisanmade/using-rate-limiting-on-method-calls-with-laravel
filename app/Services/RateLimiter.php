@@ -30,7 +30,7 @@ class RateLimiter
      * The duration that should be used for a timeout when
      * the rate limits are exceeded by too many hits.
      *
-     * @var integer
+     * @var int
      */
     protected $timeout = 10;
 
@@ -51,9 +51,9 @@ class RateLimiter
      * and set the limits the rate limiter will use.
      *
      * @param \Illuminate\Contracts\Cache\Repository $cache
-     * @param array $limits (optional)
+     * @param array                                  $limits (optional)
      */
-    public function __construct( Repository $cache, array $limits = [] )
+    public function __construct(Repository $cache, array $limits = [])
     {
         $this->cache = $cache;
         $this->limits = $limits;
@@ -62,33 +62,33 @@ class RateLimiter
     /**
      * Check if the key is rate limited.
      *
-     * @param  string $key
+     * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function isLimited($key)
     {
-        return in_array(array_keys($this->limits), $key);
+        return in_array($key, array_keys($this->limits));
     }
 
     /**
      * Check if the maximum hits has been exceeded for the key.
      *
-     * @param  string $key
+     * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function limitExceeded($key)
     {
-        return $this->getHits($key) > $this->getMax($key);
+        return $this->getHits($key) >= $this->getMax($key);
     }
 
     /**
      * Get the maximum hits the key can receive.
      *
-     * @param  string $key
+     * @param string $key
      *
-     * @return integer
+     * @return int
      */
     public function getMax($key)
     {
@@ -98,9 +98,9 @@ class RateLimiter
     /**
      * Get the hits against the cache key.
      *
-     * @param  string $key
+     * @param string $key
      *
-     * @return integer
+     * @return int
      */
     public function getHits($key)
     {
@@ -112,23 +112,27 @@ class RateLimiter
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function addHit($key)
     {
+        if (!$this->cache->has($this->getKey($key))) {
+            return $this->cache->add($this->getKey($key), 1, 1);
+        }
+
         return $this->cache->increment($this->getKey($key), 1);
     }
 
     /**
      * Get the fully qualified cache key.
      *
-     * @param  string $key
+     * @param string $key
      *
      * @return string
      */
     public function getKey($key)
     {
-        return $this->prefix ? $this->prefix . '::' . $key : $key;
+        return $this->prefix ? $this->prefix.'::'.$key : $key;
     }
 
     /**
@@ -136,7 +140,7 @@ class RateLimiter
      *
      * @param string $prefix
      *
-     * @return boolean
+     * @return bool
      */
     public function setPrefix($prefix)
     {
@@ -146,7 +150,7 @@ class RateLimiter
     /**
      * Get the timeout for when the maximum hits is exceeded.
      *
-     * @return integer
+     * @return int
      */
     public function getTimeout()
     {
@@ -156,9 +160,9 @@ class RateLimiter
     /**
      * Set the timeout used when the maximum hits is exceeded.
      *
-     * @param integer $timeout
+     * @param int $timeout
      *
-     * @return boolean
+     * @return bool
      */
     public function setTimeout($timeout)
     {
